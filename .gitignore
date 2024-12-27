@@ -1,0 +1,7 @@
+.database
+.idea
+.logs
+configs/develop.env
+
+
+
