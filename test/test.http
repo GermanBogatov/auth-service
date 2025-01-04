@@ -1,0 +1,61 @@
+### Sign-up
+
+POST http://localhost:8080/public/v1/auth/sign-up
+Content-Type: application/json
+
+{
+  "name": "German",
+  "surname": "Bogatov",
+  "email": "bogat1weee@mail.ru",
+  "password": "qwerty12345"
+}
+
+### Sign-in
+
+POST http://localhost:8080/public/v1/auth/sign-in
+Content-Type: application/json
+
+{
+  "email": "bogatovgrmn@gmail.com",
+  "password": "qwerty12345"
+}
+
+### Refresh
+GET http://localhost:8080/public/v1/auth/refresh/44c312d3-cf76-4e4e-820b-4206991bb203
+Content-Type: application/json
+
+### Get User By ID
+GET http://localhost:8080/public/v1/users/c1cfe4b9-f7c2-423c-abfa-6ed1c05a15c5
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsidXNlcnMiXSwiZXhwIjoxNzM1OTg3NzMxLCJqdGkiOiIzNmZlYmY4MC1hZGFjLTRlYmItODBiOS03MzRjYjYxYjcyM2MiLCJlbWFpbCI6ImJvZ2F0MXdlZWVAbWFpbC5ydSIsInJvbGUiOiJ1c2VyIn0.s33yKYX3qL6xXxGkwxfd_IukCOUYa7YHbW_sKIZVbQU
+
+### Get Users with filters
+GET http://localhost:8080/public/v1/users?sort=asc&order=surname&offset=0&limit=20
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsidXNlcnMiXSwiZXhwIjoxNzM1OTg3NzMxLCJqdGkiOiIzNmZlYmY4MC1hZGFjLTRlYmItODBiOS03MzRjYjYxYjcyM2MiLCJlbWFpbCI6ImJvZ2F0MXdlZWVAbWFpbC5ydSIsInJvbGUiOiJ1c2VyIn0.s33yKYX3qL6xXxGkwxfd_IukCOUYa7YHbW_sKIZVbQU
+
+### Delete User By ID
+DELETE http://localhost:8080/public/v1/users/bf56de11-b23d-4823-a148-732d8fc2bafc
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImV4cCI6MTcyNzU1OTU1NiwianRpIjoiYmY1NmRlMTEtYjIzZC00ODIzLWExNDgtNzMyZDhmYzJiYWZjIiwiZW1haWwiOiJib2dhdG92Z0BtYWlsLnJ1Iiwicm9sZSI6ImRldmVsb3BlciJ9.QMY9f4uk34ay4gKEpBM9fTnQmGt1lOUDjl5kaX3RAqY
+
+### Update User by ID
+PATCH http://localhost:8080/public/v1/users/5127d211-cd89-45fb-afdf-86c025eea1eb
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsidXNlcnMiXSwiZXhwIjoxNzI3NTk2NDQ2LCJqdGkiOiI1MTI3ZDIxMS1jZDg5LTQ1ZmItYWZkZi04NmMwMjVlZWExZWIiLCJlbWFpbCI6ImJvZ2F0MXdlZWVAbWFpbC5ydSIsInJvbGUiOiJkZXZlbG9wZXIifQ.9gpjuGAjLP3n1cj6DPPg8GNa-bi25AUR0EAiNWrsGq4
+
+{
+  "name": "German",
+  "surname": "Bogatov",
+  "password": "qwerty12345"
+}
+
+### Update Private User by ID
+
+PATCH http://localhost:8080/private/v1/users/ef904506-dc65-42c6-b44e-619ad805efd8
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsidXNlcnMiXSwiZXhwIjoxNzI3NTcyNzcwLCJqdGkiOiJjMWNmZTRiOS1mN2MyLTQyM2MtYWJmYS02ZWQxYzA1YTE1YzUiLCJlbWFpbCI6ImJvZ2F0b3Zncm1uQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiJ9.uKQKrKrQVgzYHk_MPJmS7u-K08IR49RppUuTWQ8ffSs
+
+{
+
+}

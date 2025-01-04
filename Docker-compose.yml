@@ -1,0 +1,62 @@
+version: "3.8"
+networks:
+  app-network:
+    driver: bridge
+
+services:
+  #postgres
+  database:
+    networks:
+      - app-network
+    restart: always
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=postgres
+    container_name: database
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  cache:
+    networks:
+      - app-network
+    restart: always
+    container_name: cache
+    image: redislabs/redismod:latest
+    ports:
+      - "127.0.0.1:6380:6379"
+    environment:
+      - REDIS_DB=0
+
+  app:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - database
+      - cache
+    networks:
+      - app-network
+    container_name: app
+    env_file:
+      - configs/example.docker.env
+    ports:
+      - "127.0.0.1:8080:8080"
+
+  migration:
+    restart: on-failure
+    networks:
+      - app-network
+    environment:
+      - AUTH_MIGRATION_SERVICE_MIGRATIONS_SYSTEM_NAME=auth_migration_service
+      - AUTH_MIGRATION_SERVICE_MIGRATIONS_ENV=dev
+      - AUTH_MIGRATION_SERVICE_MIGRATIONS_LOG_LEVEL=INFO
+      - AUTH_MIGRATION_SERVICE_POSTGRES_URL=postgres://username:password@database:5432/postgres?sslmode=disable
+    build:
+      context: .
+      dockerfile: migrations/Dockerfile
+    container_name: migration
+    depends_on:
+      - database
