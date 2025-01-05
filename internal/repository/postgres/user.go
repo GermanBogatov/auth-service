@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"github.com/GermanBogatov/auth-service/internal/common/apperror"
 	"github.com/GermanBogatov/auth-service/internal/common/metrics"
+	"github.com/GermanBogatov/auth-service/internal/config"
 	"github.com/GermanBogatov/auth-service/internal/entity"
 	"github.com/GermanBogatov/auth-service/pkg/postgresql"
+	"github.com/GermanBogatov/auth-service/pkg/tracer"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -39,7 +41,10 @@ func NewUser(client postgresql.Client) IUser {
 
 // CreateUser - создание пользователя
 func (u *User) CreateUser(ctx context.Context, user entity.User) error {
+	_, span := tracer.StartTrace(ctx, config.SpanPostgresCreateUser)
+	defer span.End()
 	defer metrics.ObserveRequestDurationPerMethodDB(metrics.Postgres, metrics.CreateUserDb)()
+
 	q := `
 	INSERT INTO users 
     	(id,name,surname,email,password,role,created_date) 
@@ -65,6 +70,8 @@ func (u *User) CreateUser(ctx context.Context, user entity.User) error {
 
 // GetUserByEmailAndPassword - получение пользователя по емайл и паролю
 func (u *User) GetUserByEmailAndPassword(ctx context.Context, email, password string) (entity.User, error) {
+	_, span := tracer.StartTrace(ctx, config.SpanPostgresGetUserByEmailAndPassword)
+	defer span.End()
 	defer metrics.ObserveRequestDurationPerMethodDB(metrics.Postgres, metrics.GetUserByEmailAndPasswordDb)()
 
 	q := `
@@ -89,6 +96,8 @@ func (u *User) GetUserByEmailAndPassword(ctx context.Context, email, password st
 
 // GetUserByID - получение пользователя по идентификатору
 func (u *User) GetUserByID(ctx context.Context, id string) (entity.User, error) {
+	_, span := tracer.StartTrace(ctx, config.SpanPostgresGetUserByID)
+	defer span.End()
 	defer metrics.ObserveRequestDurationPerMethodDB(metrics.Postgres, metrics.GetUserByIDDb)()
 
 	q := `
@@ -112,6 +121,8 @@ func (u *User) GetUserByID(ctx context.Context, id string) (entity.User, error) 
 }
 
 func (u *User) DeleteUserByID(ctx context.Context, id string) error {
+	_, span := tracer.StartTrace(ctx, config.SpanPostgresDeleteUserByID)
+	defer span.End()
 	defer metrics.ObserveRequestDurationPerMethodDB(metrics.Postgres, metrics.DeleteUserByIDDb)()
 
 	q := `
@@ -130,6 +141,8 @@ func (u *User) DeleteUserByID(ctx context.Context, id string) error {
 
 // UpdateUserByID - редактирование пользователя
 func (u *User) UpdateUserByID(ctx context.Context, userUpdate entity.UserUpdate) (entity.User, error) {
+	_, span := tracer.StartTrace(ctx, config.SpanPostgresUpdateUserByID)
+	defer span.End()
 	defer metrics.ObserveRequestDurationPerMethodDB(metrics.Postgres, metrics.UpdateUserByIDDb)()
 
 	query, args := prepareQueryUpdate(userUpdate)
@@ -193,6 +206,8 @@ func prepareQueryUpdate(user entity.UserUpdate) (string, []interface{}) {
 
 // GetUsers - получение пользователей
 func (u *User) GetUsers(ctx context.Context, filter entity.Filter) ([]entity.User, error) {
+	_, span := tracer.StartTrace(ctx, config.SpanPostgresGetUsers)
+	defer span.End()
 	defer metrics.ObserveRequestDurationPerMethodDB(metrics.Postgres, metrics.GetUsersDb)()
 	var q string
 	if filter.Role == nil {
@@ -234,6 +249,8 @@ func (u *User) GetUsers(ctx context.Context, filter entity.Filter) ([]entity.Use
 
 // UpdatePrivateUserByID - приватное редактирование пользователя
 func (u *User) UpdatePrivateUserByID(ctx context.Context, userUpdate entity.UserUpdatePrivate) (entity.User, error) {
+	_, span := tracer.StartTrace(ctx, config.SpanPostgresUpdatePrivateUserByID)
+	defer span.End()
 	defer metrics.ObserveRequestDurationPerMethodDB(metrics.Postgres, metrics.UpdatePrivateUserByIDDb)()
 
 	query, args := prepareQueryUpdatePrivate(userUpdate)

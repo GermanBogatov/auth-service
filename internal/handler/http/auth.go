@@ -42,7 +42,7 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) error {
 	// todo когда админ появится условия предусмотреть
 	user.AddRoleUser()
 
-	token, refreshToken, err := h.jwtService.GenerateAccessAndRefreshTokens(user)
+	token, refreshToken, err := h.jwtService.GenerateAccessAndRefreshTokens(ctx, user)
 	if err != nil {
 		return apperror.InternalServerError(err)
 	}
@@ -85,7 +85,7 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) error {
 		return apperror.InternalServerError(err)
 	}
 
-	token, refreshToken, err := h.jwtService.GenerateAccessAndRefreshTokens(user)
+	token, refreshToken, err := h.jwtService.GenerateAccessAndRefreshTokens(ctx, user)
 	if err != nil {
 		return apperror.InternalServerError(err)
 	}

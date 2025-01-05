@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"github.com/GermanBogatov/auth-service/internal/common/apperror"
 	"github.com/GermanBogatov/auth-service/internal/common/metrics"
+	"github.com/GermanBogatov/auth-service/internal/config"
 	"github.com/GermanBogatov/auth-service/internal/entity"
+	"github.com/GermanBogatov/auth-service/pkg/tracer"
 	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
 	"time"
@@ -37,6 +39,8 @@ func NewStorage(client *redis.Client, userTTL, refreshTTL int) ICache {
 
 // Get - получение данных из кеша по ключу.
 func (c *Cache) Get(ctx context.Context, key string) (string, error) {
+	_, span := tracer.StartTrace(ctx, config.SpanCacheGet)
+	defer span.End()
 	defer metrics.ObserveRequestDurationPerMethodDB(metrics.Cache, metrics.GetCache)()
 
 	value, err := c.client.Get(ctx, key).Result()
@@ -54,6 +58,8 @@ func (c *Cache) Get(ctx context.Context, key string) (string, error) {
 
 // Delete - удаление записи из кэша по ключу
 func (c *Cache) Delete(ctx context.Context, key string) error {
+	_, span := tracer.StartTrace(ctx, config.SpanCacheDelete)
+	defer span.End()
 	defer metrics.ObserveRequestDurationPerMethodDB(metrics.Cache, metrics.DeleteCache)()
 
 	err := c.client.Del(ctx, key).Err()
@@ -68,7 +74,10 @@ func (c *Cache) Delete(ctx context.Context, key string) error {
 
 // GetUser - получение пользователя из кэша
 func (c *Cache) GetUser(ctx context.Context, key string) (entity.User, error) {
+	_, span := tracer.StartTrace(ctx, config.SpanCacheGetUser)
+	defer span.End()
 	defer metrics.ObserveRequestDurationPerMethodDB(metrics.Cache, metrics.GetUserCache)()
+
 	val, err := c.client.Get(ctx, key).Result()
 	if err != nil {
 		metrics.IncRequestTotalDB(metrics.GetUserCache, metrics.OkStatus)
@@ -91,7 +100,10 @@ func (c *Cache) GetUser(ctx context.Context, key string) (entity.User, error) {
 
 // SetUser - добавление пользователя в кеш.
 func (c *Cache) SetUser(ctx context.Context, key string, user entity.User) error {
+	_, span := tracer.StartTrace(ctx, config.SpanCacheSetUser)
+	defer span.End()
 	defer metrics.ObserveRequestDurationPerMethodDB(metrics.Cache, metrics.SetUserCache)()
+
 	data, errJson := json.Marshal(user)
 	if errJson != nil {
 		return errJson
@@ -109,6 +121,8 @@ func (c *Cache) SetUser(ctx context.Context, key string, user entity.User) error
 
 // SetRefreshToken - добавление рефреш токена в кэш.
 func (c *Cache) SetRefreshToken(ctx context.Context, key, userID string) error {
+	_, span := tracer.StartTrace(ctx, config.SpanCacheSetRefreshToken)
+	defer span.End()
 	defer metrics.ObserveRequestDurationPerMethodDB(metrics.Cache, metrics.SetRefreshTokenCache)()
 	_, err := c.client.Set(ctx, key, userID, c.refreshTTL).Result()
 	if err != nil {

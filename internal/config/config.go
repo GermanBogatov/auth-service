@@ -34,12 +34,19 @@ type Http struct {
 	ReadTimeout  int    `env:"USER_SERVICE_HTTP_READ_TIMEOUT_SEC" env-default:"60"`
 }
 
+type Tracer struct {
+	Endpoint           string  `env:"TRACE_ENDPOINT" env-required:"true"`
+	Port               string  `env:"TRACE_PORT" env-required:"true"`
+	TraceRatioFraction float64 `env:"TRACE_RATIO_FRACTION" env-default:"1.0"`
+}
+
 //nolint:govet
 type Config struct {
 	Health             Health
 	Postgres           Postgres
 	Redis              Redis
 	Http               Http
+	Tracer             Tracer
 	ShutdownTimeoutSec int `env:"USER_SERVICE_SHUTDOWN_TIMEOUT_SEC" env-default:"5"`
 	JwtTTL             int `env:"USER_SERVICE_JWT_TTL" env-default:"300"`
 }
@@ -93,6 +100,13 @@ func validateENV(config *Config) error {
 	}
 	if len(config.Redis.Port) == 0 {
 		return errors.New("empty redis.Port")
+	}
+
+	if len(config.Tracer.Endpoint) == 0 {
+		return errors.New("empty tracer.Endpoint")
+	}
+	if len(config.Tracer.Port) == 0 {
+		return errors.New("empty tracer.Port")
 	}
 
 	return nil
