@@ -3,10 +3,12 @@ package service
 import (
 	"context"
 	"github.com/GermanBogatov/auth-service/internal/common/apperror"
+	"github.com/GermanBogatov/auth-service/internal/config"
 	"github.com/GermanBogatov/auth-service/internal/entity"
 	"github.com/GermanBogatov/auth-service/internal/repository/cache"
 	"github.com/GermanBogatov/auth-service/internal/repository/postgres"
 	"github.com/GermanBogatov/auth-service/pkg/logging"
+	"github.com/GermanBogatov/auth-service/pkg/tracer"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
@@ -34,11 +36,14 @@ func NewJWT(userRepo postgres.IUser, cache cache.ICache, secret string, jwtTTL i
 
 type IJWT interface {
 	UpdateRefreshToken(ctx context.Context, refreshToken string) (string, string, error)
-	GenerateAccessAndRefreshTokens(user entity.User) (string, string, error)
+	GenerateAccessAndRefreshTokens(ctx context.Context, user entity.User) (string, string, error)
 }
 
 // UpdateRefreshToken - обновление рефреш токена
 func (j *JWT) UpdateRefreshToken(ctx context.Context, refreshToken string) (string, string, error) {
+	_, span := tracer.StartTrace(ctx, config.SpanServiceUpdateRefreshToken)
+	defer span.End()
+
 	userID, err := j.cache.Get(ctx, refreshToken)
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
@@ -72,16 +77,19 @@ func (j *JWT) UpdateRefreshToken(ctx context.Context, refreshToken string) (stri
 		}
 	}()
 
-	newAccessToken, newRefreshToken, err := j.GenerateAccessAndRefreshTokens(user)
+	newAccessToken, newRefreshToken, err := j.GenerateAccessAndRefreshTokens(ctx, user)
 	if err != nil {
-		return "", "", errors.Wrap(err, "GenerateAccessToken")
+		return "", "", errors.Wrap(err, "GenerateAccessAndRefreshTokens")
 	}
 
 	return newAccessToken, newRefreshToken, nil
 }
 
 // GenerateAccessAndRefreshTokens - генерация токенов
-func (j *JWT) GenerateAccessAndRefreshTokens(user entity.User) (string, string, error) {
+func (j *JWT) GenerateAccessAndRefreshTokens(ctx context.Context, user entity.User) (string, string, error) {
+	_, span := tracer.StartTrace(ctx, config.SpanServiceGenerateAccessAndRefreshTokens)
+	defer span.End()
+
 	key := []byte(j.secret)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, entity.UserClaims{

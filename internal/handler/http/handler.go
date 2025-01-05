@@ -4,6 +4,7 @@ import (
 	_ "github.com/GermanBogatov/auth-service/docs"
 	"github.com/GermanBogatov/auth-service/internal/config"
 	"github.com/GermanBogatov/auth-service/internal/service"
+	"github.com/GermanBogatov/auth-service/pkg/tracer"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -42,6 +43,7 @@ func NewHandler(cfg *config.Config, userService service.IUser, jwtService servic
 func (h *Handler) InitRoutes() *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(middleware.Recoverer)
+	r.Use(tracer.TcpMiddleware)
 
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},

@@ -27,4 +27,28 @@ const (
 	OrderCreatedDateDB = "created_date"
 	SortDesc           = "desc"
 	SortAsc            = "asc"
+
+	SpanServiceCreateUser                     = "service-create-user"
+	SpanServiceGetUserByID                    = "service-get-user-by-id"
+	SpanServiceDeleteUserByID                 = "service-delete-user-by-id"
+	SpanServiceGetUserByEmailAndPassword      = "service-get-user-by-email-and-password"
+	SpanServiceUpdateUserByID                 = "service-update-user-by-id"
+	SpanServiceGetUsers                       = "service-get-users"
+	SpanServiceUpdatePrivateUserByID          = "service-update-private-user-by-id"
+	SpanServiceUpdateRefreshToken             = "service-update-refresh-token"
+	SpanServiceGenerateAccessAndRefreshTokens = "service-generate-access-and-refresh-tokens"
+
+	SpanCacheGet             = "cache-get"
+	SpanCacheDelete          = "cache-delete"
+	SpanCacheGetUser         = "cache-get-user"
+	SpanCacheSetUser         = "cache-set-user"
+	SpanCacheSetRefreshToken = "cache-set-refresh-token"
+
+	SpanPostgresCreateUser                = "postgres-create-user"
+	SpanPostgresGetUserByID               = "postgres-get-user-by-id"
+	SpanPostgresGetUserByEmailAndPassword = "postgres-get-user-by-email-and-password"
+	SpanPostgresDeleteUserByID            = "postgres-delete-user-by-id"
+	SpanPostgresUpdateUserByID            = "postgres-update-user-by-id"
+	SpanPostgresGetUsers                  = "postgres-get-users"
+	SpanPostgresUpdatePrivateUserByID     = "postgres-update-private-user-by-id"
 )

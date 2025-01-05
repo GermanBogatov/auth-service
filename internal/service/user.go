@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
+	"github.com/GermanBogatov/auth-service/internal/config"
 	"github.com/GermanBogatov/auth-service/internal/entity"
 	"github.com/GermanBogatov/auth-service/internal/repository/postgres"
+	"github.com/GermanBogatov/auth-service/pkg/tracer"
 	"github.com/pkg/errors"
 )
 
@@ -32,6 +34,9 @@ func NewUser(client postgres.IUser) IUser {
 
 // CreateUser - создание пользователя
 func (u *User) CreateUser(ctx context.Context, user entity.User) error {
+	_, span := tracer.StartTrace(ctx, config.SpanServiceCreateUser)
+	defer span.End()
+
 	err := u.userRepo.CreateUser(ctx, user)
 	if err != nil {
 		return errors.Wrap(err, "userRepo.CreateUser")
@@ -42,6 +47,9 @@ func (u *User) CreateUser(ctx context.Context, user entity.User) error {
 
 // GetUserByID - получение пользователя по идентификатору
 func (u *User) GetUserByID(ctx context.Context, id string) (entity.User, error) {
+	_, span := tracer.StartTrace(ctx, config.SpanServiceGetUserByID)
+	defer span.End()
+
 	user, err := u.userRepo.GetUserByID(ctx, id)
 	if err != nil {
 		return entity.User{}, errors.Wrap(err, "userRepo.GetUserByID")
@@ -52,6 +60,9 @@ func (u *User) GetUserByID(ctx context.Context, id string) (entity.User, error) 
 
 // DeleteUserByID - удаление пользователя по идентификатору
 func (u *User) DeleteUserByID(ctx context.Context, id string) error {
+	_, span := tracer.StartTrace(ctx, config.SpanServiceDeleteUserByID)
+	defer span.End()
+
 	err := u.userRepo.DeleteUserByID(ctx, id)
 	if err != nil {
 		return errors.Wrap(err, "userRepo.DeleteUserByID")
@@ -62,6 +73,9 @@ func (u *User) DeleteUserByID(ctx context.Context, id string) error {
 
 // GetUserByEmailAndPassword - получение пользователя по майлу и паролю
 func (u *User) GetUserByEmailAndPassword(ctx context.Context, email, password string) (entity.User, error) {
+	_, span := tracer.StartTrace(ctx, config.SpanServiceGetUserByEmailAndPassword)
+	defer span.End()
+
 	user, err := u.userRepo.GetUserByEmailAndPassword(ctx, email, password)
 	if err != nil {
 		return entity.User{}, errors.Wrap(err, "userRepo.GetUserByEmailAndPassword")
@@ -72,6 +86,9 @@ func (u *User) GetUserByEmailAndPassword(ctx context.Context, email, password st
 
 // UpdateUserByID - обновление пользователя
 func (u *User) UpdateUserByID(ctx context.Context, userUpdate entity.UserUpdate) (entity.User, error) {
+	_, span := tracer.StartTrace(ctx, config.SpanServiceUpdateUserByID)
+	defer span.End()
+
 	user, err := u.userRepo.UpdateUserByID(ctx, userUpdate)
 	if err != nil {
 		return entity.User{}, errors.Wrap(err, "userRepo.UpdateUserByID")
@@ -82,6 +99,9 @@ func (u *User) UpdateUserByID(ctx context.Context, userUpdate entity.UserUpdate)
 
 // GetUsers - получение списка пользователей
 func (u *User) GetUsers(ctx context.Context, filter entity.Filter) ([]entity.User, error) {
+	_, span := tracer.StartTrace(ctx, config.SpanServiceGetUsers)
+	defer span.End()
+
 	users, err := u.userRepo.GetUsers(ctx, filter)
 	if err != nil {
 		return nil, errors.Wrap(err, "userRepo.GetUsers")
@@ -92,6 +112,9 @@ func (u *User) GetUsers(ctx context.Context, filter entity.Filter) ([]entity.Use
 
 // UpdatePrivateUserByID - приватное обновление пользователя
 func (u *User) UpdatePrivateUserByID(ctx context.Context, userUpdate entity.UserUpdatePrivate) (entity.User, error) {
+	_, span := tracer.StartTrace(ctx, config.SpanServiceUpdatePrivateUserByID)
+	defer span.End()
+
 	user, err := u.userRepo.UpdatePrivateUserByID(ctx, userUpdate)
 	if err != nil {
 		return entity.User{}, errors.Wrap(err, "userRepo.UpdatePrivateUserByID")

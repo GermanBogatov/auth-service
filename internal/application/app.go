@@ -11,6 +11,7 @@ import (
 	"github.com/GermanBogatov/auth-service/pkg/logging"
 	"github.com/GermanBogatov/auth-service/pkg/postgresql"
 	"github.com/GermanBogatov/auth-service/pkg/redis"
+	"github.com/GermanBogatov/auth-service/pkg/tracer"
 	"github.com/go-chi/chi/v5"
 	"github.com/pkg/errors"
 	"net"
@@ -22,9 +23,10 @@ import (
 )
 
 type App struct {
-	cfg        *config.Config
-	httpServer *http.Server
-	router     *chi.Mux
+	cfg          *config.Config
+	httpServer   *http.Server
+	router       *chi.Mux
+	cancelTracer func(ctx context.Context)
 }
 
 // NewApplication - подключаем различные бд, инициализируем слои и роуты.
@@ -56,9 +58,21 @@ func NewApplication(ctx context.Context, cfg *config.Config) (App, error) {
 	appHandler := httpHandler.NewHandler(cfg, userService, jwtService)
 	router := appHandler.InitRoutes()
 
+	logging.Info("tracer initializing...")
+	cancelTrace, err := tracer.New(&tracer.Config{
+		ServiceName:        config.Namespace,
+		Environment:        config.ServiceEnv,
+		TraceRatioFraction: cfg.Tracer.TraceRatioFraction,
+		Endpoint:           cfg.Tracer.Endpoint + ":" + cfg.Tracer.Port,
+	})
+	if err != nil {
+		return App{}, errors.Wrap(err, "connection tracer")
+	}
+
 	return App{
-		cfg:    cfg,
-		router: router,
+		cfg:          cfg,
+		router:       router,
+		cancelTracer: cancelTrace,
 	}, nil
 }
 
@@ -95,6 +109,9 @@ func (a *App) gracefulShutdown(signals []os.Signal) {
 
 	logging.Info("--- shutdown application ---")
 	time.Sleep(time.Duration(a.cfg.ShutdownTimeoutSec) * time.Second)
+
+	logging.Info("cancel tracer...")
+	a.cancelTracer(context.Background())
 
 	logging.Infof("Caught signal %s. Shutting down...", sig)
 	if err := a.httpServer.Shutdown(context.Background()); err != nil {
