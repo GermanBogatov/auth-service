@@ -34,6 +34,5 @@ func TcpMiddleware(h http.Handler) http.Handler {
 		span.SetAttributes(NewHttpAttributes(tcp, r)...)
 
 		h.ServeHTTP(w, r.WithContext(ctx))
-		return
 	})
 }
