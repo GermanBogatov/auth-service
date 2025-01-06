@@ -24,3 +24,14 @@ jobs:
       - name: Build
         run: go build -v ./...
 
+  linter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install linter
+        run: @go clean -cache
+
+      - name: run linter
+        run: golangci-lint run ./...
+
