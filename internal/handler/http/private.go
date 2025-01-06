@@ -28,7 +28,7 @@ func (h *Handler) PrivateUpdateUser(w http.ResponseWriter, r *http.Request) erro
 	role := ctx.Value(config.ParamRole).(string)
 
 	// только админу можно редактировать пользователей любых
-	if entity.RoleType(role) != entity.RoleAdmin || entity.RoleType(role) != entity.RoleSuperAdmin {
+	if entity.RoleType(role) != entity.RoleAdmin && entity.RoleType(role) != entity.RoleSuperAdmin {
 		return apperror.BadRequestError(fmt.Errorf("user [%s] does not have rights to update user [%s]", selfUserID, userID))
 	}
 
