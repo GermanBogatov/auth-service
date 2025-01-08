@@ -19,10 +19,10 @@ type Logger struct {
 }
 
 type Config struct {
+	Output     io.Writer
 	SystemName string
 	Env        string
 	Level      string
-	Output     io.Writer
 }
 
 const (
