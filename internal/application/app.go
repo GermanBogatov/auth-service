@@ -17,6 +17,8 @@ import (
 	"github.com/pkg/errors"
 	"net"
 	"net/http"
+	"net/http/pprof"
+	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"syscall"
@@ -88,7 +90,25 @@ func NewApplication(ctx context.Context, cfg *config.Config) (App, error) {
 func (a *App) Start(ctx context.Context) error {
 	go a.gracefulShutdown([]os.Signal{syscall.SIGABRT, syscall.SIGQUIT, syscall.SIGHUP, os.Interrupt, syscall.SIGTERM})
 
+	go a.startPprof()
+
 	return a.startHttpServer()
+}
+
+// startPprof - старт профилирофщика
+func (a *App) startPprof() {
+	// Debug listener.
+	m := http.NewServeMux()
+	m.Handle("/debug/pprof/", http.HandlerFunc(pprof.Index))
+	m.Handle("/debug/pprof/cmdline", http.HandlerFunc(pprof.Cmdline))
+	m.Handle("/debug/pprof/profile", http.HandlerFunc(pprof.Profile))
+	m.Handle("/debug/pprof/symbol", http.HandlerFunc(pprof.Symbol))
+	m.Handle("/debug/pprof/trace", http.HandlerFunc(pprof.Trace))
+
+	err := http.ListenAndServe(fmt.Sprintf(":%s", a.cfg.Http.PprofPort), m)
+	if err != nil {
+		logging.Errorf("error listen pprof=%s", err)
+	}
 }
 
 // startHttpServer - старт http-сервера
