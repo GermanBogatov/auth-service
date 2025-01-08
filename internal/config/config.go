@@ -29,6 +29,7 @@ type Redis struct {
 }
 
 type Http struct {
+	PprofPort    string `env:"USER_SERVICE_HTTP_PPROF_PORT" env-required:"true"`
 	Port         string `env:"USER_SERVICE_HTTP_PORT" env-required:"true"`
 	WriteTimeout int    `env:"USER_SERVICE_HTTP_WRITE_TIMEOUT_SEC" env-default:"60"`
 	ReadTimeout  int    `env:"USER_SERVICE_HTTP_READ_TIMEOUT_SEC" env-default:"60"`
@@ -99,6 +100,9 @@ func validateENV(config *Config) error {
 
 	if len(config.Http.Port) == 0 {
 		return errors.New("empty http.Port")
+	}
+	if len(config.Http.PprofPort) == 0 {
+		return errors.New("empty http.PprofPort")
 	}
 
 	if len(config.Redis.Host) == 0 {
