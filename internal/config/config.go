@@ -40,6 +40,11 @@ type Tracer struct {
 	TraceRatioFraction float64 `env:"TRACE_RATIO_FRACTION" env-default:"1.0"`
 }
 
+type Sentry struct {
+	DSN   string `env:"SENTRY_DSN"`
+	Debug bool   `env:"SENTRY_DEBUG" env-default:"false"`
+}
+
 //nolint:govet
 type Config struct {
 	Health             Health
@@ -47,6 +52,7 @@ type Config struct {
 	Redis              Redis
 	Http               Http
 	Tracer             Tracer
+	Sentry             Sentry
 	ShutdownTimeoutSec int `env:"USER_SERVICE_SHUTDOWN_TIMEOUT_SEC" env-default:"5"`
 	JwtTTL             int `env:"USER_SERVICE_JWT_TTL" env-default:"300"`
 }

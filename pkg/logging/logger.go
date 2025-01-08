@@ -2,8 +2,10 @@ package logging
 
 import (
 	"context"
-	"errors"
 	"fmt"
+	"github.com/GermanBogatov/auth-service/pkg/logging/pkg/sentryhandler"
+	"github.com/getsentry/sentry-go"
+	"github.com/pkg/errors"
 	"io"
 	"log/slog"
 	"os"
@@ -17,10 +19,10 @@ type Logger struct {
 }
 
 type Config struct {
-	Output     io.Writer
 	SystemName string
 	Env        string
 	Level      string
+	Output     io.Writer
 }
 
 const (
@@ -109,14 +111,17 @@ func getLevelLogging(level string) (slog.Level, error) {
 }
 
 func Info(arg string) {
+	sentryhandler.CaptureMessage(arg, sentry.LevelInfo)
 	l.Info(arg)
 }
 
 func Warn(arg string) {
+	sentryhandler.CaptureException(arg, sentry.LevelWarning)
 	l.Warn(arg)
 }
 
 func Error(arg string) {
+	sentryhandler.CaptureException(arg, sentry.LevelError)
 	l.Error(arg)
 }
 
@@ -125,7 +130,9 @@ func Debug(arg string) {
 }
 
 func Fatal(arg string) {
+	sentryhandler.CaptureException(arg, sentry.LevelFatal)
 	l.Log(context.Background(), LevelFatal, arg)
+
 	os.Exit(1)
 }
 
@@ -134,22 +141,27 @@ func Trace(arg string) {
 }
 
 func Panic(arg string) {
+	sentryhandler.CaptureException(arg, sentry.LevelFatal)
 	l.Log(context.Background(), LevelPanic, arg)
+
 	panic(arg)
 }
 
 func Infof(format string, args ...any) {
 	msg := fmt.Sprintf(format, args...)
+	sentryhandler.CaptureMessage(msg, sentry.LevelInfo)
 	l.Info(msg)
 }
 
 func Warnf(format string, args ...any) {
 	msg := fmt.Sprintf(format, args...)
+	sentryhandler.CaptureException(msg, sentry.LevelWarning)
 	l.Warn(msg)
 }
 
 func Errorf(format string, args ...any) {
 	msg := fmt.Sprintf(format, args...)
+	sentryhandler.CaptureException(msg, sentry.LevelError)
 	l.Error(msg)
 }
 
@@ -159,7 +171,10 @@ func Debugf(format string, args ...any) {
 
 func Fatalf(format string, args ...any) {
 	msg := fmt.Sprintf(format, args...)
+
+	sentryhandler.CaptureException(msg, sentry.LevelFatal)
 	l.Log(context.Background(), LevelFatal, msg)
+
 	os.Exit(1)
 }
 
@@ -169,6 +184,8 @@ func Tracef(format string, args ...any) {
 
 func Panicf(format string, args ...any) {
 	msg := fmt.Sprintf(format, args...)
+	sentryhandler.CaptureException(msg, sentry.LevelFatal)
 	l.Log(context.Background(), LevelPanic, msg)
+
 	panic(msg)
 }

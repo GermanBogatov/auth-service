@@ -11,6 +11,7 @@ import (
 	"github.com/GermanBogatov/auth-service/pkg/logging"
 	"github.com/GermanBogatov/auth-service/pkg/postgresql"
 	"github.com/GermanBogatov/auth-service/pkg/redis"
+	"github.com/GermanBogatov/auth-service/pkg/sentry"
 	"github.com/GermanBogatov/auth-service/pkg/tracer"
 	"github.com/go-chi/chi/v5"
 	"github.com/pkg/errors"
@@ -67,6 +68,13 @@ func NewApplication(ctx context.Context, cfg *config.Config) (App, error) {
 	})
 	if err != nil {
 		return App{}, errors.Wrap(err, "connection tracer")
+	}
+
+	if cfg.Sentry.DSN != "" && config.ServiceEnv != "" && config.SystemName != "" {
+		err = sentry.InitSentry(config.SystemName, cfg.Sentry.DSN, config.ServiceEnv, cfg.Sentry.Debug)
+		if err != nil {
+			logging.Errorf("sentry.Init: %s", err.Error())
+		}
 	}
 
 	return App{
